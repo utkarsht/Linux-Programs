@@ -16,7 +16,7 @@ int main()
 	while(count--)
 	{
 		printf("Sending from popen\n");
-		sleep(5);
+		sleep(3);
 	}
 	return 0;
 }

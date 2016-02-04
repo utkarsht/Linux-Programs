@@ -42,12 +42,10 @@ void* readandwrite()
 		}
 		if (sender != -1)
 		for (i = 0; i < C; i++)
-		{
 			if (sender != i)
 			{
 				write(stoc[i], buf, M);}
 			}
-		}
 }
 
 char* add(char* str, int i)

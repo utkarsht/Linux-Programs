@@ -13,10 +13,10 @@ int main()
 {	
 	char buf[M];
 	int count = 3;
-	while(count--)
+	while(1)
 	{
 		printf("Sending from popen\n");
-		sleep(2);
+		sleep(3);
 	}
 	return 0;
 }
