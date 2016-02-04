@@ -1,0 +1,98 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/shm.h>
+#include <sys/poll.h>
+#include <string.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <semaphore.h>
+#include <pthread.h>
+#define C 3
+#define M 100
+#define KEY 1111
+
+int pftos, stop5;
+char* shmptr;
+
+void* fifofun(void* arg)
+{
+	char buf[M];
+	while(1)
+	{
+		read(pftos, buf, M);		
+		write(stop5, buf, M);
+		sleep(1);	
+	}
+}
+
+void* pipefun(void* arg)
+{
+	char buf[M];
+	int fd[2];
+
+	pipe(fd);
+	int p = fork();
+
+	if(p == 0)
+	{
+		close(fd[0]);
+		while(1)
+		{
+			scanf("%s", buf);
+			write(fd[1], buf, M);
+		}
+	}
+	else
+	{
+		close(fd[1]);
+		while(1)
+		{
+			read(fd[0], buf, M);
+			write(stop5, buf, M);
+		}
+	}
+}
+
+void sigfun()
+{
+	write(stop5, shmptr, M);
+	sleep(1);	
+}
+
+void* popenfun()
+{
+	FILE* pf = popen("./all_popen", "r");
+//	int fd = fileno(pf);
+	char buf[M];
+	int count = 3;
+	while(count--)
+	{
+		fgets(buf, M, pf);
+		write(stop5, buf, M);
+	}
+}
+
+int main()
+{
+	signal(SIGUSR1, sigfun);
+	mkfifo("pftos", 0666);
+	mkfifo("stop5", 0666);
+
+	pftos = open("pftos", O_RDONLY);		
+	stop5 = open("stop5", O_WRONLY);
+
+	int shmid = shmget(KEY, M, IPC_CREAT | 0666);
+	shmptr = shmat(shmid, 0, 0);
+
+	pthread_t p[C];
+	pthread_create(&p[0], NULL, &fifofun, NULL);
+	pthread_create(&p[1], NULL, &pipefun, NULL);
+	pthread_create(&p[2], NULL, &popenfun, NULL);
+
+	int i = 0;
+	for (i = 0; i < C; i++)
+		pthread_join(p[i], NULL);
+	
+	return 0;
+}
