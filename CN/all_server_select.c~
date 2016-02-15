@@ -79,6 +79,7 @@ void readandsend()
 			{
 				read(fd_popen, buf, M);
 			//	write(stop5, buf, M);
+			//	some problem when using popen too
 			}			
 		}
 	}

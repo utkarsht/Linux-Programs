@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 	FILE* f = popen(argv[1], "r");
 	dup2(fileno(f), 0);
 
-	if(argc == 2)		//	in case only one arg
+	if(argc == 2)		//	incase only one arg
 	{
 		fgets(buf, M, f);
 		printf("at the end : %s\n", buf);
