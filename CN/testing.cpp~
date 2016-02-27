@@ -11,6 +11,9 @@ string toHex(string bin)
 
 int main()
 {
+	int t = 13;
+	cout << t << endl;
+	cout << hex << t << endl;
 	toHex("01010");
 //	toHex("1010");
 	toHex("001010");

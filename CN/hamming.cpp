@@ -29,6 +29,15 @@ string toHex(string bin)
 	return hexa;
 }
 
+string fromHex(string hexa)
+{
+	int l = hexa.length();
+	string bin = "";
+	for (int i = 0; i < l; i++)
+	{
+		
+	}
+}
 
 int getCount(string op, int pos)
 {
