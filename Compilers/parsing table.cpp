@@ -7,6 +7,20 @@ F Fi
 F +F
 F F-
 */
+/*
+2
+S (S)S
+S #
+S
+*/
+/*
+4
+E E+E
+E E*E
+E (E)
+E #
+E
+*/
 /*		another example
 8
 E TG
@@ -83,6 +97,15 @@ string operator-(const string& a, const string& b)
 	string temp = a;
 	temp.erase(temp.begin() + pos, temp.begin() + pos + b.length());
 	return temp;
+}
+
+string add(string a, string b)
+{
+	if (a != "#" && b != "#")
+		return (a + b);	
+	if (a == "#")
+		return b;
+	return a;
 }
 
 string common(string a, string b)
@@ -183,10 +206,11 @@ void remove_left_recursion()
 			for (int i = 0; i < t.size(); i++)
 			{
 				if (t[i][0] != p->first)
-					beta.push_back(t[i] + tn);
+					beta.push_back(add(t[i], tn));
 				else
-					alpha.push_back(t[i] + tn - f);
+					alpha.push_back(add(t[i], tn) - f);
 			}
+			alpha.push_back("#");
 			mp[p->first] = beta;
 			mp[nt] = alpha;	
 		}
