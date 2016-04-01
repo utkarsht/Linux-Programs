@@ -47,6 +47,9 @@ int main(int argc, char** argv)
 			error("error in accept");
 			printf("%d", errno);
 		}
+
+		read(newsfd, buffer, M);
+				
 		
 		int c = fork();
 		if (c == 0)

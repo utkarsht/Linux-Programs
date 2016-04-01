@@ -1,0 +1,24 @@
+d [0-9]
+ws [ \n\t\r]
+
+%{
+	#include <strings.h>
+	int cnt = 0;
+%}
+
+%%
+[+-]?[0-9]+("."[0-9]+)? {
+	printf("Number\n");
+}
+
+ws+ {
+	
+}
+
+%%
+
+int main() 
+{
+	yylex();
+	return 0;	
+}

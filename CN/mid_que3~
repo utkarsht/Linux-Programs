@@ -1,0 +1,14 @@
+#include <stdio.h>
+#include <unistd.h>
+
+int main()
+{
+	FILE* fd2 = popen("p2", "w");
+	FILE* fd3 = popen("p3", "w");
+	FILE* fd4 = popen("p4", "w");
+	FILE* fd5 = popen("p5", "w");
+
+	int fd[2];
+	pipe(fd);
+	
+}

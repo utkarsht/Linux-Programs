@@ -15,7 +15,7 @@ void error(char *msg)
 int main(int argc, char** argv)
 {
 	if (argc < 2)
-		err("usage : ./obj portno");
+		err("usage : ./obj portno");	
 
 	int sockfd, portno, n;
     struct sockaddr_in serv_addr;
