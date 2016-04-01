@@ -43,6 +43,7 @@ int main(int argc, char** argv)
 
 	while(1)
 	{
+	//	write exit when want to stop servicing
 		fgets(buffer, M, stdin);
 		n = write(sockfd, buffer, strlen(buffer));
 		if (n < 0) 

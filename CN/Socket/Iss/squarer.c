@@ -11,8 +11,13 @@ int main(int argc, char* argv[])
 	while (1)
 	{
 		fgets(buffer, M, stdin);
+		if (strncmp(buffer, "exit", 4) == 0)
+			break;
+
 		sscanf(buffer, "%d", &a);
 		sprintf(buffer, "Square is %d\n", a*a);	
 		write(1, buffer, strlen(buffer));
 	}
+
+	write(1, "Service exited", 15);
 }

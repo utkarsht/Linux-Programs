@@ -1,9 +1,8 @@
-//	prev iss_serv.c
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
@@ -15,6 +14,26 @@ void error(char *msg)
     exit(1);
 }
 
+int clnt[] = {0, 0};
+int max_clnt[] = {2, 1};
+
+int avail(char* servc)
+{
+	if (strncmp(servc, "add", 3) == 0)
+	{
+		if (clnt[0] == max_clnt[0])
+			return 0;
+		clnt[0]++;
+	}	
+	else
+	{
+		if (clnt[1] == max_clnt[1])
+			return 0;
+		clnt[1]++;		
+	}
+	return 1;
+}
+
 int main(int argc, char** argv)
 {
 	if (argc < 2)
@@ -22,14 +41,14 @@ int main(int argc, char** argv)
 
 	int n, sfd, newsfd, portno, clntlen;
 	char buffer[M];
-	struct sockaddr_in serv_addr, clnt_addr;
+	portno = atoi(argv[1]);
 
 	sfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sfd < 0) 
 		error("ERROR opening socket");
 
+	struct sockaddr_in serv_addr, clnt_addr;
 	bzero((char *) &serv_addr, sizeof(serv_addr));
-	portno = atoi(argv[1]);
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serv_addr.sin_port = htons(portno);
@@ -38,40 +57,42 @@ int main(int argc, char** argv)
 		error("ERROR on binding");
 
 	listen(sfd, 5);
-	fd_set test;
-	FD_ZERO(&test);
-	FD_SET(sfd, &test);
-
+	
 	while(1)
 	{
-		select(sfd + 1, &test, NULL, NULL, NULL);
-
-		if (FD_ISSET(sfd, &test))
+		clntlen = sizeof(clnt_addr);
+		newsfd = accept(sfd, (struct sockaddr *) &clnt_addr, &clntlen);
+		if (newsfd < 0)
 		{
-			clntlen = sizeof(clnt_addr);
-			newsfd = accept(sfd, (struct sockaddr *) &clnt_addr, &clntlen);
-			if (newsfd < 0)
-				error("error in accept");
+			error("error in accept");
+			printf("%d", errno);
+		}
 		
+		read(newsfd, buffer, M);
+		printf("%s", buffer);	
+
+		if (avail(buffer))
+		{
 			int c = fork();
 			if (c == 0)
 			{
 				close(sfd);
-				bzero(buffer, M);
-				n = read(newsfd, buffer, M);
-			  	if (n < 0) 
-		 			error("ERROR reading from socket");
-				printf("%s\n", buffer);	
 				printf("Connected now give input\n");
-			
+
 				dup2(newsfd, 0);
 				dup2(newsfd, 1);
-				execl(buffer, buffer, NULL);
+
+				if (strncmp(buffer, "add", 3) == 0)
+					execl("addr", "addr", NULL);
+				else
+					execl("squarer", "squarer", NULL);		
 			}
 			else
 			{
 				close(newsfd);
 			}
-		}
+		}		
+		else
+			write(newsfd, "Service not available", 22);
 	}
-}	
+}

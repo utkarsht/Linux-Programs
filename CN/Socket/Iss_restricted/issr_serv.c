@@ -34,10 +34,17 @@ int avail(char* servc)
 	return 1;
 }
 
+void sigHandler()
+{
+	
+}
+
 int main(int argc, char** argv)
 {
 	if (argc < 2)
 		err("usage : ./obj portno");	
+
+	signal(SIGUSR1, sigHandler);
 
 	int n, sfd, newsfd, portno, clntlen;
 	char buffer[M];

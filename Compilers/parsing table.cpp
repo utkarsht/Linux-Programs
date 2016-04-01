@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /*		example			<- just give input here only : first line is number of production and then each production
+=======
+/*		example
+>>>>>>> 673c887e506791d08d0070f4e9fd31dbfc5fc05b
 6	
 E E+E
 E E-E

@@ -19,7 +19,7 @@ int max_clnt[] = {2, 1};
 
 int avail(char* servc)
 {
-	if (strncmp(serc, "add", 3) == 0)
+	if (strncmp(servc, "add", 3) == 0)
 	{
 		if (clnt[0] == max_clnt[0])
 			return 0;
@@ -34,10 +34,17 @@ int avail(char* servc)
 	return 1;
 }
 
+void sigHandler()
+{
+		
+}
+
 int main(int argc, char** argv)
 {
 	if (argc < 2)
 		err("usage : ./obj portno");	
+
+	signal(SIGUSR1, sigHandler);
 
 	int n, sfd, newsfd, portno, clntlen;
 	char buffer[M];

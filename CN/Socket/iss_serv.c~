@@ -55,8 +55,6 @@ int main(int argc, char** argv)
 			n = read(newsfd, buffer, M);
 			printf("%s", buffer);	
 			printf("Connected now give input\n");
-			
-			int i = 0;
 
 			dup2(newsfd, 0);
 			dup2(newsfd, 1);

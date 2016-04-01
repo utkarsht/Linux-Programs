@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
@@ -19,7 +20,6 @@ int main(int argc, char** argv)
 
 	int sockfd, portno, n;
     struct sockaddr_in serv_addr;
-    char buffer[M];
 
     portno = atoi(argv[1]);
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -34,6 +34,7 @@ int main(int argc, char** argv)
     if (connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) 
         error("ERROR connecting");
 
+	char buffer[M];
 	printf("Please enter service name : \n");
 	fgets(buffer, M, stdin);
 	n = write(sockfd, buffer, strlen(buffer));
@@ -42,6 +43,7 @@ int main(int argc, char** argv)
 
 	while(1)
 	{
+	//	write exit when want to stop servicing
 		fgets(buffer, M, stdin);
 		n = write(sockfd, buffer, strlen(buffer));
 		if (n < 0) 

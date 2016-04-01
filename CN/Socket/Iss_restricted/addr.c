@@ -5,7 +5,7 @@
 
 int main(int argc, char* argv[])
 {
-	int a;
+	int a, b;
 	char buffer[M];
 
 	while (1)
@@ -14,10 +14,11 @@ int main(int argc, char* argv[])
 		if (strncmp(buffer, "exit", 4) == 0)
 			break;
 
-		sscanf(buffer, "%d", &a);
-		sprintf(buffer, "Square is %d\n", a*a);	
-		write(1, buffer, strlen(buffer));
+		sscanf(buffer, "%d %d", &a, &b);
+		sprintf(buffer, "Sum is %d\n", a + b);
+		write(1, buffer, strlen(buffer));	
 	}
 
 	write(1, "Service exited", 15);
+	write(svtos, "addr", 5);
 }
