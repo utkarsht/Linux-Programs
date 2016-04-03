@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
+#include <pthread.h>
 #define M 256
 
 void error(char *msg)
@@ -15,43 +16,34 @@ void error(char *msg)
     exit(1);
 }
 
-int ar[2] = {0};
-
-int already(char *buff)
+void* solve(void* arg)
 {
-	if (strncmp(buff, "add", 3) == 0)
+	int fd = *(int *)arg;
+	int a;
+	char buffer[M];
+
+	while (1)
 	{
-		if (ar[0])
-			return 1;
-		else
-			ar[0] = 1;
+		read(fd, buffer, M);
+		if (strncmp(buffer, "exit", 4) == 0)
+			break;
+
+		sscanf(buffer, "%d", &a);
+		sprintf(buffer, "Thread %d : Square is %d\n", fd, a * a);
+		write(fd, buffer, strlen(buffer));	
 	}
-	if (strncmp(buff, "square", 6) == 0)
-	{
-		if (ar[1])
-			return 1;
-		else
-			ar[1] = 1;
-	}	
-	return 0;
+
+	write(1, "Service exited", 15);
 }
 
-char* getPort(char *buff)
-{
-	if (strncmp(buff, "add", 3) == 0)
-		return "8000";
-	if (strncmp(buff, "square", 6) == 0)
-		return "8001";	
-}
-
-int main(int argc, char** argv)
+int main(int argc, char* argv[])
 {
 	if (argc < 2)
 		err("usage : ./obj portno");	
 
-	int n, sfd, newsfd, portno, clntlen;
-	char buffer[M];
-	portno = atoi(argv[1]);
+	int sfd, newsfd, clntlen;
+	int portno = atoi(argv[1]);
+	printf("opened square service on port %d\n", portno);
 
 	sfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sfd < 0) 
@@ -74,28 +66,13 @@ int main(int argc, char** argv)
 		newsfd = accept(sfd, (struct sockaddr *) &clnt_addr, &clntlen);
 		if (newsfd < 0)
 		{
-			error("error in server accept");
+			error("error in accept");
 			printf("%d", errno);
 		}
 
-		read(newsfd, buffer, M);
-		if (!already(buffer))
-		{
-			int c = fork();
-			if (c == 0)
-			{
-				close(sfd);
-				printf("Connected now give input\n");
-
-				if (strncmp(buffer, "add", 3) == 0)
-					execl("add", "add", getPort(buffer), NULL);
-				else
-					execl("square", "square", getPort(buffer), NULL);		
-			}
-			else
-			{
-				close(newsfd);
-			}
-		}
-	}
+		pthread_t newThread;
+		int* fd = (int *)malloc(sizeof(int));
+		*fd = newsfd;
+		pthread_create(&newThread, NULL, solve, (void*)fd);		
+	}	
 }

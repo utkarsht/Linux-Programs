@@ -14,6 +14,7 @@ int main(int argc, char* argv[])
 		fgets(buffer, M, stdin);
 		if (strncmp(buffer, "exit", 4) == 0)
 		{
+			kill(getppid(), SIGUSR1);
 			break;
 		}
 
@@ -22,6 +23,5 @@ int main(int argc, char* argv[])
 		write(1, buffer, strlen(buffer));	
 	}
 
-	kill(getppid(), SIGUSR1);
 	write(1, "Service exited", 15);
 }

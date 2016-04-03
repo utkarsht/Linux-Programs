@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <signal.h>
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
+#include <signal.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
@@ -15,38 +15,33 @@ void error(char *msg)
     exit(1);
 }
 
-int clnt[] = {0, 0};
-int max_clnt[] = {2, 1};
+int ar[2] = {0};
 
-int avail(char* servc)
+int already(char *buff)
 {
-	if (strncmp(servc, "add", 3) == 0)
+	if (strncmp(buff, "add", 3) == 0)
 	{
-		if (clnt[0] == max_clnt[0])
-			return 0;
-		clnt[0]++;
-	}	
-	else
-	{
-		if (clnt[1] == max_clnt[1])
-			return 0;
-		clnt[1]++;		
+		if (ar[0])
+			return 1;
+		else
+			ar[0] = 1;
 	}
-	return 1;
+	if (strncmp(buff, "square", 6) == 0)
+	{
+		if (ar[1])
+			return 1;
+		else
+			ar[1] = 1;
+	}	
+	return 0;
 }
 
-//	when got a signal, either read from shared memory
-//	which service has send the signal and decrement that count
-//  or for two service check from signal number itself <- done here
-
-void sigH1()
+char* getPort(char *buff)
 {
-	clnt[0]--;
-}
-
-void sigH2()
-{
-	clnt[1]--;
+	if (strncmp(buff, "add", 3) == 0)
+		return "7000";
+	if (strncmp(buff, "square", 6) == 0)
+		return "7001";	
 }
 
 int main(int argc, char** argv)
@@ -54,9 +49,6 @@ int main(int argc, char** argv)
 	if (argc < 2)
 		err("usage : ./obj portno");	
 
-	signal(SIGUSR1, sigH1);
-	signal(SIGUSR2, sigH2);
-	
 	int n, sfd, newsfd, portno, clntlen;
 	char buffer[M];
 	portno = atoi(argv[1]);
@@ -82,14 +74,12 @@ int main(int argc, char** argv)
 		newsfd = accept(sfd, (struct sockaddr *) &clnt_addr, &clntlen);
 		if (newsfd < 0)
 		{
-			error("error in accept");
+			error("error in server accept");
 			printf("%d", errno);
 		}
-		
-		read(newsfd, buffer, M);
-		printf("%s", buffer);	
 
-		if (avail(buffer))
+		read(newsfd, buffer, M);
+		if (!already(buffer))
 		{
 			int c = fork();
 			if (c == 0)
@@ -97,20 +87,15 @@ int main(int argc, char** argv)
 				close(sfd);
 				printf("Connected now give input\n");
 
-				dup2(newsfd, 0);
-				dup2(newsfd, 1);
-
 				if (strncmp(buffer, "add", 3) == 0)
-					execl("addr", "addr", NULL);
+					execl("add", "add", getPort(buffer), NULL);
 				else
-					execl("squarer", "squarer", NULL);		
+					execl("square", "square", getPort(buffer), NULL);		
 			}
 			else
 			{
 				close(newsfd);
 			}
-		}		
-		else
-			write(newsfd, "Service not available", 22);
+		}
 	}
 }

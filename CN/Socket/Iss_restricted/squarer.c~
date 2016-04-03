@@ -6,22 +6,22 @@
 
 int main(int argc, char* argv[])
 {
-	int a, b;
+	int a;
 	char buffer[M];
 
 	while (1)
 	{
 		fgets(buffer, M, stdin);
 		if (strncmp(buffer, "exit", 4) == 0)
-		{
+		{			
+			kill(getppid(), SIGUSR2);
 			break;
 		}
 
-		sscanf(buffer, "%d %d", &a, &b);
-		sprintf(buffer, "Sum is %d\n", a + b);
-		write(1, buffer, strlen(buffer));	
+		sscanf(buffer, "%d", &a);
+		sprintf(buffer, "Square is %d\n", a*a);	
+		write(1, buffer, strlen(buffer));
 	}
 
-	kill(getppid(), SIGUSR1);
 	write(1, "Service exited", 15);
 }

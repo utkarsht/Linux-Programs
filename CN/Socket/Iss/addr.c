@@ -20,5 +20,4 @@ int main(int argc, char* argv[])
 	}
 
 	write(1, "Service exited", 15);
-	write(svtos, "addr", 5);
 }

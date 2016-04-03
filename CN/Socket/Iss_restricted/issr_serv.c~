@@ -86,15 +86,15 @@ int main(int argc, char** argv)
 			printf("%d", errno);
 		}
 		
-		read(newsfd, buffer, M);
-		printf("%s", buffer);	
-
 		if (avail(buffer))
 		{
 			int c = fork();
 			if (c == 0)
 			{
 				close(sfd);
+				read(newsfd, buffer, M);
+				printf("%s", buffer);	
+				if (avail(buffer))
 				printf("Connected now give input\n");
 
 				dup2(newsfd, 0);
