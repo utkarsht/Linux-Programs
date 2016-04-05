@@ -39,9 +39,9 @@ int already(char *buff)
 char* getPort(char *buff)
 {
 	if (strncmp(buff, "add", 3) == 0)
-		return "8000";
+		return "6500";
 	if (strncmp(buff, "square", 6) == 0)
-		return "8001";	
+		return "6501";	
 }
 
 int main(int argc, char** argv)

@@ -1,0 +1,4 @@
+This file is made for testing of first program of unix socket.
+User will enter the number of bytes to read and process p1 will read that many bytes from it 
+then after file descriptor will be sent to process p2 while will read other bytes from the file
+this process will keep continue, and file descriptor will be send back and forth.
