@@ -16,7 +16,7 @@ char fname[M];
 char* get_fullname(char* f)
 {
 	if(curdir[0] == '\0')
-		strcpy(curdir, "/home/utkarsh/RPC/NFSystem");
+		strcpy(curdir, "/home/utkarsh/RPC/NFSystem");         //  give your nfs-home directory here
 
 	strcpy(fname, curdir);
 	strcat(fname, "/");
@@ -32,7 +32,7 @@ nfs_ls_1_svc(void *argp, struct svc_req *rqstp)
 	if(curdir[0] == '\0')
 	{
 //	    getcwd(curdir, M);
-		strcpy(curdir, "/home/utkarsh/RPC/NFSystem");
+		strcpy(curdir, "/home/utkarsh/RPC/NFSystem");          //  give your nfs-home directory here
 	}
 
 	DIR* directory;
@@ -84,7 +84,7 @@ nfs_cd_1_svc(file_args *argp, struct svc_req *rqstp)
 	char* tmp = argp->filename;
 
 	if(curdir[0] == '\0')
-		strcpy(curdir, "/home/utkarsh/RPC/NFSystem");
+		strcpy(curdir, "/home/utkarsh/RPC/NFSystem");        //  give your nfs-home directory here
 
 	if (argp->filename == NULL)
 		return NULL;
