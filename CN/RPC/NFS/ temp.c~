@@ -1,0 +1,9 @@
+#include <stdio.h>
+
+int main()
+{
+	if (mkdir("trial",0777) == -1) {
+	    perror(argv[0]);
+	}
+	return 0;
+}
