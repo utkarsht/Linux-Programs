@@ -1,4 +1,0 @@
-gcc -pthread server.c -o serv
-gcc -pthread backup_server.c -o bserv
-gcc client.c -o clnt
-echo "compiled"

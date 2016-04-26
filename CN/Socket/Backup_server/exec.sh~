@@ -1,4 +1,0 @@
-gcc server.c -o serv
-gcc backup_server.c -o bserv
-gcc client.c -o clnt
-echo "compiled"
