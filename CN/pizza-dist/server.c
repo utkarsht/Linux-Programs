@@ -1,0 +1,72 @@
+#include "utils.h"
+#define M 128
+#define W 3
+
+char* shmptr;
+int client[M], usfd[W], usfd_boy;
+char buffer[M];
+
+void shm_init()
+{
+	int shmid = shmget(1234, M, IPC_CREAT | 0666);
+	shmptr = shmat(shmid, 0, 0);
+}
+
+void waiter_init()
+{
+	//	unix connection
+	char* path = "/tmp/btow";
+	int sfd = init_sockbind(path);
+	int i;
+
+	for (i = 0; i < W; i++)
+	{
+		int c = fork();
+		if (c == 0)
+			execl("waiter", "waiter", NULL);
+	}
+	for (i = 0; i < W; i++)
+	{
+		usfd[i] = unix_accept(sfd);
+	}	
+}
+
+void dboy_init()
+{
+	char* path = "/tmp/btoboy";
+	usfd_boy = init_sockbind(path);
+	usfd_boy = unix_accept(usfd_boy);
+}
+
+void sigHandler()
+{
+	int cno = shmptr[0] - '0';
+	send_fd(usfd_boy, client[cno]);
+}
+
+int main(int argc, char **argv)
+{
+	if (argc != 2)
+		err("usage: ./a.out portno");
+
+	shm_init();
+	signal(SIGUSR1, sigHandler);
+
+//	tcp connection
+	int port = atoi(argv[1]);
+	int sfd = tcpsocket_bind(port);
+	int cno = 0;
+
+	waiter_init();
+	dboy_init();
+
+	while (1)
+	{
+		int nsfd = tcp_accept(sfd);
+		client[cno++] = nsfd;
+
+		send_fd(usfd[cno % 3], nsfd);
+		sprintf(buffer, "%d", cno % 3);
+		write(usfd[cno % 3], buffer, M);
+	}
+}
